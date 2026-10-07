@@ -24,6 +24,16 @@ To deploy, push the folder to GitHub and import it on Vercel. It needs no config
 | `/collective` | 3D ceramics hero, a manifesto whose words light up as you scroll, promises, team and timeline |
 | `/contact` | Two-door conversion form (book space / hire artist / join roster). Two steps, a progress bar, and a success state. Links from the rest of the site fill it in ahead of time, e.g. `?door=hire&artist=…` |
 
+## Light & dark themes
+
+- The site follows the visitor's system setting on the first visit. The sun/moon button in the nav switches themes, and the choice is remembered.
+- A small inline script in `app/layout.tsx` sets the theme before the first paint, so the page never flashes the wrong colours.
+- Colour tokens live at the top of `app/globals.css`. Dark is `:root`, light is `:root[data-theme="light"]`. Body text in both themes meets WCAG AA contrast. In light mode the accent is a deeper terracotta (#b8481c) so orange text stays readable.
+- The 3D scenes switch their background, fog, floor, grid and label colours with the theme (`sceneColors` in `lib/theme.ts`).
+- Until the visitor picks a theme, the site follows the OS setting, including live changes.
+- **Contrast:** every page passes the axe-core `color-contrast` check in both themes. Borders that mark a button, chip or input use a `--control` token that is at least 3:1 against the page (WCAG 1.4.11). Keyboard users get a visible focus ring.
+- **High-contrast mode:** visitors who turn on "Increase contrast" in their OS (`prefers-contrast: more`) get a crisper version of whichever theme they are using: stronger text, borders and accent, and no grain.
+
 ## UX details
 
 - A preloader runs once per session. Page changes use a curtain transition. Scrolling is smoothed with Lenis.

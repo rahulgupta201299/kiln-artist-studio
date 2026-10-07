@@ -4,8 +4,11 @@ import { ContactShadows, Edges, Environment, Html, Lightformer, OrbitControls } 
 import { Suspense, useRef, useState } from "react";
 import * as THREE from "three";
 import { spaces, type Space } from "@/lib/data";
+import { sceneColors, useTheme } from "@/lib/theme";
 
-function Props({ id, w, d }: { id: string; w: number; d: number }) {
+type C = (typeof sceneColors)["dark"];
+
+function Props({ id, w, d, c }: { id: string; w: number; d: number; c: C }) {
   // tiny furniture so each room reads at a glance
   if (id === "photo")
     return (
@@ -25,7 +28,7 @@ function Props({ id, w, d }: { id: string; w: number; d: number }) {
         ))}
         <mesh position={[0, 0.06, 0.3]}>
           <boxGeometry args={[0.8, 0.1, 0.25]} />
-          <meshStandardMaterial color="#2a211c" />
+          <meshStandardMaterial color={c.prop} />
         </mesh>
       </group>
     );
@@ -38,7 +41,7 @@ function Props({ id, w, d }: { id: string; w: number; d: number }) {
         </mesh>
         <mesh position={[-0.3, 0.08, 0.2]}>
           <boxGeometry args={[0.4, 0.12, 0.25]} />
-          <meshStandardMaterial color="#1c1512" />
+          <meshStandardMaterial color={c.prop} />
         </mesh>
       </group>
     );
@@ -71,7 +74,7 @@ function Props({ id, w, d }: { id: string; w: number; d: number }) {
   );
 }
 
-function Room({ s, active, onSelect }: { s: Space; active: boolean; onSelect: (id: string) => void }) {
+function Room({ s, active, onSelect, c }: { s: Space; active: boolean; onSelect: (id: string) => void; c: C }) {
   const g = useRef<THREE.Group>(null);
   const [hover, setHover] = useState(false);
   const [w, h, d] = s.dims;
@@ -101,15 +104,15 @@ function Room({ s, active, onSelect }: { s: Space; active: boolean; onSelect: (i
       {/* floor */}
       <mesh position={[0, 0.02, 0]} receiveShadow>
         <boxGeometry args={[w, 0.04, d]} />
-        <meshStandardMaterial color={active ? s.color : "#2a211c"} roughness={0.7} emissive={s.color} emissiveIntensity={active ? 0.25 : hover ? 0.08 : 0} />
+        <meshStandardMaterial color={active ? s.color : c.floor} roughness={0.7} emissive={s.color} emissiveIntensity={active ? 0.25 : hover ? 0.08 : 0} />
       </mesh>
       {/* glass walls */}
       <mesh position={[0, h / 2, 0]}>
         <boxGeometry args={[w, h, d]} />
         <meshPhysicalMaterial color={s.color} transparent opacity={active ? 0.16 : 0.06} roughness={0.1} depthWrite={false} />
-        <Edges color={active || hover ? s.color : "#5a4d44"} threshold={15} />
+        <Edges color={active || hover ? s.color : c.edge} threshold={15} />
       </mesh>
-      <Props id={s.id} w={w} d={d} />
+      <Props id={s.id} w={w} d={d} c={c} />
       {(active || hover) && (
       <Html position={[0, h + 0.25, 0]} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
@@ -118,9 +121,9 @@ function Room({ s, active, onSelect }: { s: Space; active: boolean; onSelect: (i
             fontSize: 13,
             padding: "6px 12px",
             borderRadius: 999,
-            background: active ? s.color : "rgba(14,11,10,.75)",
-            color: active ? "#1a0f0a" : "#f2ebe3",
-            border: "1px solid rgba(242,235,227,.2)",
+            background: active ? s.color : c.label,
+            color: active ? "#1a0f0a" : c.labelInk,
+            border: "1px solid rgba(128,110,95,.3)",
             transition: "all .3s",
             fontFamily: "var(--sans)",
           }}
@@ -134,20 +137,22 @@ function Room({ s, active, onSelect }: { s: Space; active: boolean; onSelect: (i
 }
 
 export default function StudioScene({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
+  const [theme] = useTheme();
+  const c = sceneColors[theme];
   return (
     <Canvas camera={{ position: [6.5, 6.2, 7.5], fov: 34 }} dpr={[1, 1.75]} shadows="percentage">
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={theme === "light" ? 0.75 : 0.4} />
       <directionalLight position={[5, 8, 4]} intensity={1.6} castShadow color="#ffe7d1" />
       <pointLight position={[-3, 2, 2]} intensity={6} color="#e2683c" distance={8} />
       <Suspense fallback={null}>
         {/* building slab */}
         <mesh position={[0, -0.08, 0]} receiveShadow>
           <boxGeometry args={[7.4, 0.12, 5.2]} />
-          <meshStandardMaterial color="#1a1512" roughness={0.9} />
+          <meshStandardMaterial color={c.slab} roughness={0.9} />
         </mesh>
-        <gridHelper args={[7.4, 24, "#3a2f28", "#241d19"]} position={[0, -0.015, 0]} />
+        <gridHelper key={theme} args={[7.4, 24, c.grid1, c.grid2]} position={[0, -0.015, 0]} />
         {spaces.map((s) => (
-          <Room key={s.id} s={s} active={active === s.id} onSelect={onSelect} />
+          <Room key={s.id} s={s} active={active === s.id} onSelect={onSelect} c={c} />
         ))}
         <ContactShadows position={[0, -0.14, 0]} opacity={0.6} scale={14} blur={2.4} far={4} />
         <Environment resolution={128}>

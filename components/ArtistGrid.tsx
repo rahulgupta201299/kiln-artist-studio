@@ -23,7 +23,7 @@ export default function ArtistGrid() {
           {disciplines.map((d) => (
             <button key={d} role="tab" aria-selected={f === d} className={`chip ${f === d ? "on" : ""}`} onClick={() => setF(d)}>
               {d}
-              <span style={{ opacity: 0.55, marginLeft: 6 }}>{d === "All" ? artists.length : artists.filter((a) => a.discipline === d).length}</span>
+              <span className="count">{d === "All" ? artists.length : artists.filter((a) => a.discipline === d).length}</span>
             </button>
           ))}
         </div>

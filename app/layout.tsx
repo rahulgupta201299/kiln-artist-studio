@@ -7,6 +7,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import Preloader from "@/components/Preloader";
 import { brand } from "@/lib/data";
+import { themeScript } from "@/lib/theme";
 
 // Self-hosted fonts (no network needed at build time)
 const serif = localFont({
@@ -24,11 +25,19 @@ export const metadata: Metadata = {
   description: "A working studio space and an artist collective in one. Book rooms for shoots, sessions and launches, or commission artists from our 120+ roster.",
 };
 
-export const viewport: Viewport = { themeColor: "#0e0b0a" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0e0b0a" },
+    { media: "(prefers-color-scheme: light)", color: "#f4efe8" },
+  ],
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="en" data-theme="dark" className={`${serif.variable} ${sans.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <Preloader />
         <SmoothScroll />

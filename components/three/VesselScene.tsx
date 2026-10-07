@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Lightformer, Sparkles } from "@react-three/drei";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { sceneColors, useTheme } from "@/lib/theme";
 
 /** Thrown-on-the-wheel ceramic vessels, built from lathe profiles. */
 function Vessel({ profile, color, position, scale = 1, speed = 0.3 }: { profile: number[][]; color: string; position: [number, number, number]; scale?: number; speed?: number }) {
@@ -49,18 +50,20 @@ function Group({ variant, children }: { variant: "cta" | "about"; children: Reac
 }
 
 export default function VesselScene({ variant = "cta" }: { variant?: "cta" | "about" }) {
+  const [theme] = useTheme();
+  const c = sceneColors[theme];
   return (
     <Canvas camera={{ position: [0, 0, 7], fov: 40 }} dpr={[1, 1.6]} gl={{ alpha: true }}>
-      <ambientLight intensity={0.3} />
+      <ambientLight intensity={theme === "light" ? 0.7 : 0.3} />
       <pointLight position={[0, 0, 2]} intensity={10} color="#ff7a3c" distance={8} />
       <directionalLight position={[3, 5, 4]} intensity={1.6} color="#ffe1c4" />
       <Suspense fallback={null}>
         <Group variant={variant}>
           <Vessel profile={vase} color="#d9572c" position={[0, 0.2, 0]} scale={1.15} />
-          <Vessel profile={bowl} color="#f2ebe3" position={[-2.1, -1.1, -1.2]} scale={0.8} speed={-0.2} />
+          <Vessel profile={bowl} color={theme === "light" ? "#d9c6b0" : "#f2ebe3"} position={[-2.1, -1.1, -1.2]} scale={0.8} speed={-0.2} />
           <Vessel profile={bottle} color="#5e6b5a" position={[1.9, -0.3, -1]} scale={0.9} speed={0.4} />
         </Group>
-        <Sparkles count={50} scale={[10, 5, 5]} size={2} speed={0.3} color="#f0a35e" />
+        <Sparkles count={50} scale={[10, 5, 5]} size={2} speed={0.3} color={c.sparkle} />
         <Environment resolution={128}>
           <Lightformer form="rect" intensity={3} color="#ffd2ad" position={[0, 4, 4]} scale={[8, 2, 1]} />
           <Lightformer form="ring" intensity={3} color="#e2683c" position={[-5, 0, -2]} scale={3} />

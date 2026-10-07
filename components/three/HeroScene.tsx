@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { paintCanvas } from "@/lib/art";
 import { artists } from "@/lib/data";
+import { sceneColors, useTheme } from "@/lib/theme";
 
 /** The glowing, breathing "kiln" at the centre of the hero. */
 function Core() {
@@ -145,6 +146,8 @@ function Rig() {
 }
 
 export default function HeroScene() {
+  const [theme] = useTheme();
+  const c = sceneColors[theme];
   const [label, setLabel] = useState<string | null>(null);
   const [count, setCount] = useState(9);
   useEffect(() => {
@@ -153,9 +156,9 @@ export default function HeroScene() {
   return (
     <>
       <Canvas camera={{ position: [0, 0.4, 8.2], fov: 42 }} dpr={[1, 1.75]} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
-        <color attach="background" args={["#0e0b0a"]} />
-        <fog attach="fog" args={["#0e0b0a", 8, 16]} />
-        <ambientLight intensity={0.25} />
+        <color attach="background" args={[c.bg]} />
+        <fog attach="fog" args={[c.bg, 8, 16]} />
+        <ambientLight intensity={theme === "light" ? 0.6 : 0.25} />
         <pointLight position={[0, 0, 0]} intensity={18} color="#ff7a3c" distance={6} />
         <directionalLight position={[4, 6, 5]} intensity={1.4} color="#ffe1c4" />
         <Suspense fallback={null}>
@@ -163,7 +166,7 @@ export default function HeroScene() {
             <Core />
             <Orbit count={count} onHover={setLabel} />
           </Stage>
-          <Sparkles count={70} scale={[12, 6, 8]} size={2.2} speed={0.35} color="#f0a35e" opacity={0.8} />
+          <Sparkles count={70} scale={[12, 6, 8]} size={2.2} speed={0.35} color={c.sparkle} opacity={0.8} />
           <Environment resolution={256}>
             <Lightformer form="rect" intensity={3} color="#ffd2ad" position={[0, 4, 4]} scale={[8, 2, 1]} />
             <Lightformer form="ring" intensity={4} color="#e2683c" position={[-5, 0, -2]} scale={3} />
@@ -182,7 +185,8 @@ export default function HeroScene() {
             zIndex: 3,
             padding: "8px 16px",
             borderRadius: 999,
-            background: "rgba(14,11,10,.7)",
+            background: c.label,
+            color: c.labelInk,
             border: "1px solid var(--line-2)",
             fontSize: 13,
             backdropFilter: "blur(10px)",

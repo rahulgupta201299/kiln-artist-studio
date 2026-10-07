@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { brand, nav } from "@/lib/data";
 import Arrow from "./Arrow";
 import Magnetic from "./Magnetic";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Nav() {
   const pathname = usePathname();
@@ -50,8 +51,9 @@ export default function Nav() {
               <span className="live-dot" />
               Studio open today
             </span>
+            <ThemeToggle />
             <Magnetic>
-              <Link href="/contact?door=space" className="btn btn-primary">
+              <Link href="/contact?door=space" className="btn btn-primary hide-xs">
                 Book a visit <Arrow />
               </Link>
             </Magnetic>

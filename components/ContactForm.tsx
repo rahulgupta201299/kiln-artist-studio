@@ -122,7 +122,7 @@ export default function ContactForm() {
                 initial={{ scale: 0, rotate: -90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 14, delay: 0.1 }}
-                style={{ width: 96, height: 96, borderRadius: "50%", background: "var(--accent)", color: "#1a0f0a", display: "grid", placeItems: "center", fontSize: 40, margin: "0 auto 28px" }}
+                style={{ width: 96, height: 96, borderRadius: "50%", background: "var(--accent)", color: "var(--on-accent)", display: "grid", placeItems: "center", fontSize: 40, margin: "0 auto 28px" }}
               >
                 ✓
               </motion.div>
